@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedControl — Seu Guia de Medicamentos</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="bg-orbs">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⊕</span>
+        <span class="logo-text">Med<strong>Control</strong></span>
+      </div>
+      <p class="tagline">Seus medicamentos, no horário certo.</p>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- FORMULÁRIO DE ADIÇÃO -->
+    <section class="card card-form">
+      <h2 class="card-title">Adicionar Medicamento</h2>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="med-name">Nome do medicamento</label>
+          <input type="text" id="med-name" placeholder="Ex: Dipirona 500mg" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="med-dose">Dosagem</label>
+          <input type="text" id="med-dose" placeholder="Ex: 1 comprimido" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="med-time">Horário</label>
+          <input type="time" id="med-time" />
+        </div>
+
+        <div class="field field-full">
+          <label for="med-notes">Observações <span class="optional">(opcional)</span></label>
+          <input type="text" id="med-notes" placeholder="Ex: Tomar após as refeições" autocomplete="off" />
+        </div>
+      </div>
+
+      <button class="btn-add" id="btn-add">
+        <span class="btn-icon">+</span> Adicionar
+      </button>
+
+      <p class="error-msg" id="error-msg"></p>
+    </section>
+
+    <!-- LISTA DE MEDICAMENTOS -->
+    <section class="card card-list">
+      <div class="list-header">
+        <h2 class="card-title">Meus Medicamentos</h2>
+        <span class="badge" id="count-badge">0</span>
+      </div>
+
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="Buscar medicamento…" />
+        <span class="search-icon">⌕</span>
+      </div>
+
+      <ul class="med-list" id="med-list">
+        <!-- itens inseridos via JS -->
+      </ul>
+
+      <div class="empty-state" id="empty-state">
+        <span class="empty-icon">💊</span>
+        <p>Nenhum medicamento cadastrado ainda.</p>
+        <p class="empty-sub">Adicione o primeiro usando o formulário ao lado.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE CONFIRMAÇÃO DE REMOÇÃO -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-icon">⚠</div>
+      <h3>Remover medicamento?</h3>
+      <p id="modal-msg">Tem certeza que deseja remover este medicamento?</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btn-cancel">Cancelar</button>
+        <button class="btn-confirm" id="btn-confirm">Sim, remover</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/front end/script.js"></script>
+</body>
+</html>
