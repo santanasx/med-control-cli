@@ -1,9 +1,5 @@
-/* ============================================
-   MedControl — script.js
-   ============================================ */
-
-// ── Estado ──────────────────────────────────
-let medications = JSON.parse(localStorage.getItem('medcontrol_meds') || '[]');
+const API_URL = 'http://192.168.1.14:8000/medicamentos';
+let medications = [];
 let pendingRemoveId = null;
 
 // ── Elementos ───────────────────────────────
@@ -23,14 +19,22 @@ const modalOverlay = document.getElementById('modal-overlay');
 const modalMsg     = document.getElementById('modal-msg');
 const btnCancel    = document.getElementById('btn-cancel');
 const btnConfirm   = document.getElementById('btn-confirm');
-
 const toastEl      = document.getElementById('toast');
 
-// ── Utilitários ─────────────────────────────
-function saveData() {
-  localStorage.setItem('medcontrol_meds', JSON.stringify(medications));
+// ── Integração com a API ────────────────────
+async function loadMedications() {
+  try {
+    const response = await fetch(API_URL);
+    if (response.ok) {
+      medications = await response.json();
+      renderList(searchInput.value);
+    }
+  } catch (error) {
+    showError('Erro ao conectar com o servidor.');
+  }
 }
 
+// ── Utilitários ─────────────────────────────
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -51,6 +55,15 @@ function formatTime(t) {
   if (!t) return '--:--';
   const [h, m] = t.split(':');
   return `${h}h${m}`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // ── Renderização ────────────────────────────
@@ -85,44 +98,25 @@ function renderList(filter = '') {
   setTimeout(() => (countBadge.style.transform = 'scale(1)'), 200);
 }
 
-// ── Remover ──────────────────────────────────
-function confirmRemove() {
-  if (!pendingRemoveId) return;
-
-  // 1. Salva o ID em uma variável local antes de fechar o modal
-  const idToRemove = pendingRemoveId; 
-  
-  const med = medications.find(m => m.id === idToRemove);
-  const li = medList.querySelector(`[data-id="${idToRemove}"]`);
-
-  if (li) {
-    li.classList.add('removing');
-    setTimeout(() => {
-      // 2. Usa a variável local no filtro, em vez da global
-      medications = medications.filter(m => m.id !== idToRemove);
-      saveData();
-      renderList(searchInput.value);
-    }, 280);
-  } else {
-    medications = medications.filter(m => m.id !== idToRemove);
-    saveData();
-    renderList(searchInput.value);
-  }
-
-  closeModal(); // Aqui o pendingRemoveId vira null, mas não afeta mais o setTimeout
-  showToast(`🗑 ${med ? med.name : 'Medicamento'} removido.`, '#6b3020');
-}
-
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+function createMedItem(med) {
+  const li = document.createElement('li');
+  li.dataset.id = med.id; 
+  li.className = 'med-item';
+  
+  li.innerHTML = `
+    <div class="item-info">
+      <div class="item-name">${escapeHtml(med.name)}</div>
+      <div class="item-dose">${escapeHtml(med.dose)}</div>
+      ${med.notes ? `<div class="item-notes">📝 ${escapeHtml(med.notes)}</div>` : ''}
+    </div>
+    <div class="item-time-badge">${formatTime(med.time)}</div>
+    <button class="btn-remove" onclick="openModal('${med.id}', '${escapeHtml(med.name)}')">✖</button>
+  `;
+  return li;
 }
 
 // ── Adicionar ────────────────────────────────
-function addMedication() {
+async function addMedication() {
   const name  = inputName.value.trim();
   const dose  = inputDose.value.trim();
   const time  = inputTime.value;
@@ -133,18 +127,34 @@ function addMedication() {
   if (!time) return showError('⚠ Selecione o horário.');
 
   const med = { id: generateId(), name, dose, time, notes };
-  medications.push(med);
-  saveData();
-  renderList(searchInput.value);
 
-  // Limpar campos
-  inputName.value  = '';
-  inputDose.value  = '';
-  inputTime.value  = '';
-  inputNotes.value = '';
-  inputName.focus();
+  try {
+    // Envia os dados para a API (Back End)
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(med)
+    });
 
-  showToast(`✓ ${name} adicionado com sucesso!`);
+    if (response.ok) {
+      const novoMed = await response.json();
+      medications.push(novoMed);
+      renderList(searchInput.value);
+
+      // Limpar campos
+      inputName.value  = '';
+      inputDose.value  = '';
+      inputTime.value  = '';
+      inputNotes.value = '';
+      inputName.focus();
+
+      showToast(`✓ ${name} adicionado com sucesso!`);
+    } else {
+      showError('Erro ao salvar no banco de dados.');
+    }
+  } catch (error) {
+    showError('Erro de conexão com o servidor.');
+  }
 }
 
 // ── Remover ──────────────────────────────────
@@ -159,12 +169,42 @@ function closeModal() {
   modalOverlay.classList.remove('active');
 }
 
+async function confirmRemove() {
+  if (!pendingRemoveId) return;
 
+  const idToRemove = pendingRemoveId; 
+  const med = medications.find(m => m.id === idToRemove);
+  const li = medList.querySelector(`[data-id="${idToRemove}"]`);
+
+  try {
+    // Avisa a API para deletar do banco de dados
+    const response = await fetch(`${API_URL}/${idToRemove}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      if (li) {
+        li.classList.add('removing');
+        setTimeout(() => {
+          medications = medications.filter(m => m.id !== idToRemove);
+          renderList(searchInput.value);
+        }, 280);
+      } else {
+        medications = medications.filter(m => m.id !== idToRemove);
+        renderList(searchInput.value);
+      }
+      closeModal();
+      showToast(`🗑 ${med ? med.name : 'Medicamento'} removido.`, '#c0392b');
+    }
+  } catch (error) {
+    showError('Erro ao deletar no servidor.');
+    closeModal();
+  }
+}
 
 // ── Eventos ──────────────────────────────────
 btnAdd.addEventListener('click', addMedication);
 
-// Adicionar com Enter em qualquer campo
 [inputName, inputDose, inputTime, inputNotes].forEach(el => {
   el.addEventListener('keydown', e => {
     if (e.key === 'Enter') addMedication();
@@ -172,38 +212,17 @@ btnAdd.addEventListener('click', addMedication);
 });
 
 searchInput.addEventListener('input', () => renderList(searchInput.value));
-
 btnCancel.addEventListener('click', closeModal);
 btnConfirm.addEventListener('click', confirmRemove);
 
-// Fechar modal clicando no overlay
 modalOverlay.addEventListener('click', e => {
   if (e.target === modalOverlay) closeModal();
 });
 
-// Fechar modal com Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
 
 // ── Init ────────────────────────────────────
-renderList();
-
-function createMedItem(med) {
-  const li = document.createElement('li');
-  // Adiciona o data-id para a função de remover conseguir encontrar o elemento
-  li.dataset.id = med.id; 
-  
-  // Cria o conteúdo do item da lista
-  li.innerHTML = `
-    <div class="med-details">
-      <strong>${escapeHtml(med.name)}</strong> - ${escapeHtml(med.dose)}
-      <br>
-      <span>⏰ ${formatTime(med.time)}</span>
-      ${med.notes ? `<br><small>📝 ${escapeHtml(med.notes)}</small>` : ''}
-    </div>
-    <button class="btn-remove" onclick="openModal('${med.id}', '${escapeHtml(med.name)}')">Remover</button>
-  `;
-  
-  return li;
-}
+// Carrega a lista do banco de dados ao abrir a página
+loadMedications();
