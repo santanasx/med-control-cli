@@ -25,4 +25,5 @@ Pequenas clínicas, consultórios médicos, cuidadores ou qualquer pessoa que ne
 ## ℹ️ Informações Adicionais
 **Versão Atual:** 1.0.0  
 **Autor:** Arthur Santana Ruffino
+
 **Repositório:**
