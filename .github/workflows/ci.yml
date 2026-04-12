@@ -21,4 +21,4 @@ jobs:
         run: ruff check .
 
       - name: Rodar testes
-        run: pytest
+        run: python -m pytest
