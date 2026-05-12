@@ -1,11 +1,11 @@
 :root {
     --primary: #2d5a4c;
+    --danger: #ff4d4d;
     --bg-gradient: linear-gradient(135deg, #e8f0eb 0%, #f7f1e6 100%);
-    --card-bg: #ffffff;
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background: var(--bg-gradient);
     margin: 0;
     min-height: 100vh;
@@ -15,86 +15,52 @@ body {
 }
 
 .dashboard { width: 100%; max-width: 1000px; }
-
 .main-header { margin-bottom: 30px; color: var(--primary); }
-.main-header h1 { margin: 0; display: flex; align-items: center; gap: 10px; }
-.main-header p { margin: 5px 0; opacity: 0.7; font-size: 0.9rem; }
-
-.content-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr; /* Cria as duas colunas */
-    gap: 30px;
-    align-items: start;
-}
+.content-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
 
 .card {
-    background: var(--card-bg);
+    background: white;
     padding: 25px;
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.04);
 }
 
-h2 { font-size: 1.1rem; color: #333; margin-top: 0; margin-bottom: 20px; }
-
-.input-group { margin-bottom: 15px; }
 .input-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; }
-
-label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: #888;
-    margin-bottom: 6px;
-}
+.input-group { margin-bottom: 15px; }
+label { display: block; font-size: 0.7rem; font-weight: bold; color: #888; margin-bottom: 6px; }
 
 input, textarea {
-    width: 100%;
-    padding: 12px;
-    background: #f8f6f2;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    box-sizing: border-box;
+    width: 100%; padding: 12px; background: #f8f6f2;
+    border: none; border-radius: 12px; box-sizing: border-box;
 }
 
-button {
-    width: 100%;
-    padding: 14px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: transform 0.2s;
+button#btn-submit {
+    width: 100%; padding: 14px; background: var(--primary);
+    color: white; border: none; border-radius: 14px; font-weight: bold; cursor: pointer;
 }
 
-button:active { transform: scale(0.98); }
-
-/* Estilo da Lista */
-.list-header { display: flex; justify-content: space-between; align-items: center; }
-.badge { background: #e0ece6; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-
-.search-bar { margin-bottom: 20px; }
-
+/* Itens da Lista */
 .medicamento-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px; background: #fff; border-bottom: 1px solid #f0f0f0;
 }
 
-.btn-delete {
-    background: none;
-    color: #ff4d4d;
-    width: auto;
-    padding: 5px;
+.btn-delete { background: none; color: var(--danger); border: none; cursor: pointer; font-weight: bold; }
+
+/* Modal Styles */
+.modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000;
+    justify-content: center; align-items: center;
 }
 
-/* Responsivo para celular */
-@media (max-width: 800px) {
-    .content-wrapper { grid-template-columns: 1fr; }
+.modal-content {
+    background: white; padding: 30px; border-radius: 20px; text-align: center;
+    max-width: 320px; width: 90%;
 }
+
+.modal-buttons { display: flex; gap: 15px; margin-top: 25px; }
+.btn-modal-cancelar { background: #eee; color: #666; border: none; padding: 12px; border-radius: 10px; flex: 1; cursor: pointer; }
+.btn-modal-excluir { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 10px; flex: 1; cursor: pointer; font-weight: bold; }
+
+@media (max-width: 800px) { .content-wrapper { grid-template-columns: 1fr; } }

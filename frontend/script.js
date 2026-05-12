@@ -1,4 +1,6 @@
 const API_URL = "https://med-control-cli.onrender.com/pacientes";
+let idParaRemover = null;
+const modal = document.getElementById('modal-confirmacao');
 
 async function carregarMedicamentos() {
     const lista = document.getElementById('lista-medicamentos');
@@ -7,7 +9,6 @@ async function carregarMedicamentos() {
     try {
         const response = await fetch(API_URL);
         const medicamentos = await response.json();
-        
         contador.innerText = medicamentos.length;
         
         if (medicamentos.length === 0) {
@@ -18,25 +19,37 @@ async function carregarMedicamentos() {
         lista.innerHTML = medicamentos.map(med => `
             <div class="medicamento-item">
                 <div>
-                    <strong style="color: #2d5a4c;">${med.nome}</strong> 
-                    <span style="color: #666; font-size: 0.9rem;">(${med.dosagem})</span><br>
+                    <strong style="color: #2d5a4c;">${med.nome}</strong> (${med.dosagem})<br>
                     <small>⏰ ${med.horario}</small>
                 </div>
-                <button class="btn-delete" onclick="remover(${med.id})">✕</button>
+                <button class="btn-delete" onclick="abrirModal(${med.id})">✕</button>
             </div>
         `).join('');
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Erro ao buscar dados:", e); }
 }
 
-async function remover(id) {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    carregarMedicamentos();
+function abrirModal(id) {
+    idParaRemover = id;
+    modal.style.display = 'flex';
 }
+
+document.getElementById('btn-cancelar-modal').onclick = () => {
+    modal.style.display = 'none';
+    idParaRemover = null;
+};
+
+document.getElementById('btn-confirmar-exclusao').onclick = async () => {
+    if (idParaRemover) {
+        await fetch(`${API_URL}/${idParaRemover}`, { method: 'DELETE' });
+        modal.style.display = 'none';
+        carregarMedicamentos();
+    }
+};
 
 document.getElementById('form-medicamento').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btn-submit');
-    btn.innerHTML = "Salvando...";
+    btn.innerText = "Salvando...";
 
     const dados = {
         nome: document.getElementById('nome').value,
@@ -51,8 +64,8 @@ document.getElementById('form-medicamento').addEventListener('submit', async (e)
         body: JSON.stringify(dados)
     });
 
-    document.getElementById('form-medicamento').reset();
-    btn.innerHTML = "+ Adicionar";
+    e.target.reset();
+    btn.innerText = "+ Adicionar";
     carregarMedicamentos();
 });
 

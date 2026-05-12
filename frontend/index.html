@@ -27,17 +27,14 @@
                             <input type="text" id="dosagem" placeholder="Ex: 1 comprimido" required>
                         </div>
                     </div>
-
                     <div class="input-group">
                         <label>HORÁRIO</label>
                         <input type="time" id="horario" required>
                     </div>
-
                     <div class="input-group">
                         <label>OBSERVAÇÕES <span class="optional">(opcional)</span></label>
                         <textarea id="observacoes" placeholder="Ex: Tomar após as refeições"></textarea>
                     </div>
-
                     <button type="submit" id="btn-submit">+ Adicionar</button>
                 </form>
             </section>
@@ -47,17 +44,27 @@
                     <h2>Meus Medicamentos</h2>
                     <span id="contador-meds" class="badge">0</span>
                 </div>
-                
                 <div class="search-bar">
                     <input type="text" placeholder="🔍 Buscar medicamento...">
                 </div>
-
                 <div id="lista-medicamentos">
-                    <p class="empty-state">Nenhum medicamento cadastrado.</p>
+                    <p class="empty-state">Carregando...</p>
                 </div>
             </section>
         </div>
     </div>
+
+    <div id="modal-confirmacao" class="modal">
+        <div class="modal-content">
+            <h3>Excluir Medicamento?</h3>
+            <p>Esta ação removerá o registro permanentemente.</p>
+            <div class="modal-buttons">
+                <button id="btn-cancelar-modal" class="btn-modal-cancelar">Cancelar</button>
+                <button id="btn-confirmar-exclusao" class="btn-modal-excluir">Excluir</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
