@@ -1,27 +1,58 @@
-/* Adicione isso ao final do seu style.css */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f1ea;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+header { text-align: center; margin-bottom: 20px; }
+h1 { color: #2d5a4c; margin: 0; }
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background-color: #2d5a4c;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
 .medicamento-item {
+    background: #f9f9f9;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
     border-left: 5px solid #2d5a4c;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .btn-delete {
+    background-color: #ff4d4d;
     width: auto;
     padding: 8px 12px;
-    background-color: #ff4d4d;
-    color: white;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    margin-left: 10px;
-}
-
-.btn-delete:hover {
-    background-color: #cc0000;
+    font-size: 0.8rem;
 }

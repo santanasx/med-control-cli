@@ -31,15 +31,14 @@ def criar(med: schemas.MedicamentoCreate, db: Session = Depends(storage.get_db))
     db.refresh(db_med)
     return db_med
 
-# --- NOVA ROTA PARA DELETAR ---
 @app.delete("/pacientes/{med_id}")
 def deletar(med_id: int, db: Session = Depends(storage.get_db)):
     db_med = db.query(storage.Medicamento).filter(storage.Medicamento.id == med_id).first()
     if not db_med:
-        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
+        raise HTTPException(status_code=404, detail="Não encontrado")
     db.delete(db_med)
     db.commit()
-    return {"message": "Removido com sucesso"}
+    return {"message": "Removido"}
 
 @app.get("/")
 def root():
