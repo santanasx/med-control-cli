@@ -4,8 +4,27 @@ from sqlalchemy.orm import Session
 from typing import List
 
 # Importações do seu próprio projeto (verifique se os caminhos estão corretos)
-from .database import engine, get_db
-from . import models, schemas
+import os
+import sys
+
+# Garante que o Python encontre as pastas do seu projeto
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from typing import List
+
+# Importações ajustadas
+try:
+    import database, models, schemas
+except ImportError:
+    from . import database, models, schemas
+
+# Inicializa o app
+app = FastAPI(title="MedControl API")
+
+
 
 # Cria as tabelas no banco de dados automaticamente ao iniciar
 models.Base.metadata.create_all(bind=engine)
