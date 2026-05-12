@@ -4,3 +4,4 @@ pytest-mock==3.14.0
 ruff
 pytest
 fastapi
+uvicorn
