@@ -1,12 +1,6 @@
-import pytest
-from app import main
+from app.storage import save_meds, load_meds  # Adicione o import correto aqui
 
-
-def test_main_executa_sem_erro(monkeypatch):
-    # simula entrada do usuário se necessário
-    monkeypatch.setattr("builtins.input", lambda _: "0")
-
-    try:
-        main.main()
-    except SystemExit:
-        pass  # esperado em CLI
+def test_salvar_e_carregar():
+    save_meds([{"nome": "Dipirona"}])
+    data = load_meds()
+    assert data["nome"] == "Dipirona"
