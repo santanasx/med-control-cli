@@ -1,17 +1,46 @@
-alert("O JavaScript carregou com sucesso!");
-
 const API_URL = "https://med-control-cli.onrender.com/pacientes";
 
+// Função para buscar e mostrar os medicamentos na tela
+async function carregarMedicamentos() {
+    try {
+        const response = await fetch(API_URL);
+        if (response.ok) {
+            const medicamentos = await response.json();
+            const lista = document.getElementById('lista-medicamentos');
+            
+            if (medicamentos.length === 0) {
+                lista.innerHTML = '<p style="text-align:center; color: #888;">Nenhum medicamento cadastrado.</p>';
+                return;
+            }
+
+            lista.innerHTML = medicamentos.map(med => `
+                <div class="medicamento-item">
+                    <strong>💊 ${med.nome}</strong> - ${med.dosagem}<br>
+                    <small>⏰ Horário: ${med.horario}</small>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #666;">
+                        ${med.descricao || 'Sem observações'}
+                    </p>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error("Erro ao carregar lista:", error);
+    }
+}
+
+// Configuração do Formulário
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM carregado. Procurando o formulário...");
     const form = document.getElementById('form-medicamento');
     
     if (form) {
-        console.log("Formulário encontrado!");
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert("Você clicou no botão! Tentando salvar...");
             
+            // Feedback visual no botão
+            const botao = form.querySelector('button');
+            botao.disabled = true;
+            botao.innerHTML = "Salvando...";
+
             const novoMed = {
                 nome: document.getElementById('nome').value,
                 dosagem: document.getElementById('dosagem').value,
@@ -27,16 +56,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    alert("Salvo no banco!");
-                    location.reload(); 
+                    form.reset(); // Limpa os campos
+                    await carregarMedicamentos(); // Atualiza a lista na hora
                 } else {
-                    alert("Erro no servidor.");
+                    alert("Erro ao salvar no servidor. Verifique o banco de dados.");
                 }
             } catch (error) {
-                alert("Erro de conexão.");
+                console.error("Erro de conexão:", error);
+            } finally {
+                botao.disabled = false;
+                botao.innerHTML = "+ Adicionar";
             }
         });
-    } else {
-        alert("ERRO: O JavaScript não achou o formulário com id='form-medicamento'");
     }
+    
+    // Carrega a lista assim que abrir o site
+    carregarMedicamentos();
 });
