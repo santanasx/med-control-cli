@@ -1,11 +1,15 @@
 :root {
     --primary: #2d5a4c;
+    --primary-hover: #1e3d33;
     --danger: #ff4d4d;
+    --danger-light: #fff5f5;
+    --text-main: #333;
+    --text-light: #888;
     --bg-gradient: linear-gradient(135deg, #e8f0eb 0%, #f7f1e6 100%);
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--bg-gradient);
     margin: 0;
     min-height: 100vh;
@@ -25,42 +29,80 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.04);
 }
 
-.input-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; }
-.input-group { margin-bottom: 15px; }
-label { display: block; font-size: 0.7rem; font-weight: bold; color: #888; margin-bottom: 6px; }
-
+/* Inputs e Botão Adicionar */
 input, textarea {
     width: 100%; padding: 12px; background: #f8f6f2;
-    border: none; border-radius: 12px; box-sizing: border-box;
+    border: 2px solid transparent; border-radius: 12px; box-sizing: border-box;
+    transition: all 0.3s;
 }
+input:focus { border-color: var(--primary); outline: none; background: white; }
 
 button#btn-submit {
     width: 100%; padding: 14px; background: var(--primary);
-    color: white; border: none; border-radius: 14px; font-weight: bold; cursor: pointer;
+    color: white; border: none; border-radius: 14px; font-weight: bold; 
+    cursor: pointer; transition: background 0.3s;
 }
+button#btn-submit:hover { background: var(--primary-hover); }
 
-/* Itens da Lista */
+/* Estilo do Item na Lista */
 .medicamento-item {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 15px; background: #fff; border-bottom: 1px solid #f0f0f0;
+    padding: 18px; background: #fff; border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+.medicamento-item:hover { background: #fafafa; }
+
+/* Botão de Excluir (O "X") */
+.btn-delete {
+    background: var(--danger-light);
+    color: var(--danger);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+.btn-delete:hover {
+    background: var(--danger);
+    color: white;
+    transform: rotate(90deg);
 }
 
-.btn-delete { background: none; color: var(--danger); border: none; cursor: pointer; font-weight: bold; }
-
-/* Modal Styles */
+/* Modal de Confirmação */
 .modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000;
+    background: rgba(45, 90, 76, 0.2); backdrop-filter: blur(8px); z-index: 1000;
     justify-content: center; align-items: center;
 }
 
 .modal-content {
-    background: white; padding: 30px; border-radius: 20px; text-align: center;
-    max-width: 320px; width: 90%;
+    background: white; padding: 40px; border-radius: 28px; text-align: center;
+    max-width: 350px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-.modal-buttons { display: flex; gap: 15px; margin-top: 25px; }
-.btn-modal-cancelar { background: #eee; color: #666; border: none; padding: 12px; border-radius: 10px; flex: 1; cursor: pointer; }
-.btn-modal-excluir { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 10px; flex: 1; cursor: pointer; font-weight: bold; }
+.modal-icon { font-size: 40px; margin-bottom: 15px; }
+.modal-content h3 { margin: 0; color: var(--text-main); font-size: 1.4rem; }
+.modal-content p { color: var(--text-light); line-height: 1.5; margin: 10px 0 25px; }
+
+.modal-buttons { display: flex; gap: 12px; }
+
+.btn-modal-cancelar {
+    background: #f0f2f0; color: #555; border: none; padding: 14px;
+    border-radius: 14px; flex: 1; cursor: pointer; font-weight: 600;
+    transition: background 0.3s;
+}
+.btn-modal-cancelar:hover { background: #e2e5e2; }
+
+.btn-modal-excluir {
+    background: var(--danger); color: white; border: none; padding: 14px;
+    border-radius: 14px; flex: 1; cursor: pointer; font-weight: bold;
+    transition: opacity 0.3s;
+}
+.btn-modal-excluir:hover { opacity: 0.9; }
 
 @media (max-width: 800px) { .content-wrapper { grid-template-columns: 1fr; } }
