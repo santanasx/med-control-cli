@@ -1,101 +1,56 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MedControl — Seu Guia de Medicamentos</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedControl - Gerenciador de Medicamentos</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="bg-orbs">
-    <span class="orb orb-1"></span>
-    <span class="orb orb-2"></span>
-    <span class="orb orb-3"></span>
-  </div>
+    <div class="container">
+        <header>
+            <h1>💊 MedControl</h1>
+            <p>Gerencie seus horários com facilidade</p>
+        </header>
 
-  <header class="header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">⊕</span>
-        <span class="logo-text">Med<strong>Control</strong></span>
-      </div>
-      <p class="tagline">Seus medicamentos, no horário certo.</p>
+        <main>
+            <section class="form-section">
+                <h2>Adicionar Medicamento</h2>
+                <form id="form-medicamento">
+                    <div class="input-group">
+                        <label for="nome">Nome do Medicamento</label>
+                        <input type="text" id="nome" placeholder="Ex: Ibuprofeno" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="dosagem">Dosagem</label>
+                        <input type="text" id="dosagem" placeholder="Ex: 600mg" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="horario">Horário</label>
+                        <input type="time" id="horario" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="observacoes">Observações (opcional)</label>
+                        <textarea id="observacoes" placeholder="Ex: Tomar após as refeições"></textarea>
+                    </div>
+
+                    <button type="submit" id="btn-adicionar">+ Adicionar</button>
+                </form>
+            </section>
+
+            <section class="lista-section">
+                <h2>Meus Medicamentos</h2>
+                <div id="lista-medicamentos">
+                    <p class="loading">Carregando medicamentos...</p>
+                </div>
+            </section>
+        </main>
     </div>
-  </header>
 
-  <main class="main">
-
-    <section class="card card-form">
-      <h2 class="card-title">Adicionar Medicamento</h2>
-
-      <div class="form-grid">
-        <div class="field">
-          <label for="med-name">Nome do medicamento</label>
-          <input type="text" id="med-name" placeholder="Ex: Dipirona 500mg" autocomplete="off" />
-        </div>
-
-        <div class="field">
-          <label for="med-dose">Dosagem</label>
-          <input type="text" id="med-dose" placeholder="Ex: 1 comprimido" autocomplete="off" />
-        </div>
-
-        <div class="field">
-          <label for="med-time">Horário</label>
-          <input type="time" id="med-time" />
-        </div>
-
-        <div class="field field-full">
-          <label for="med-notes">Observações <span class="optional">(opcional)</span></label>
-          <input type="text" id="med-notes" placeholder="Ex: Tomar após as refeições" autocomplete="off" />
-        </div>
-      </div>
-
-      <button class="btn-add" id="btn-add">
-        <span class="btn-icon">+</span> Adicionar
-      </button>
-
-      <p class="error-msg" id="error-msg"></p>
-    </section>
-
-    <section class="card card-list">
-      <div class="list-header">
-        <h2 class="card-title">Meus Medicamentos</h2>
-        <span class="badge" id="count-badge">0</span>
-      </div>
-
-      <div class="search-wrap">
-        <input type="text" id="search" placeholder="Buscar medicamento…" />
-        <span class="search-icon">⌕</span>
-      </div>
-
-      <ul class="med-list" id="med-list">
-        </ul>
-
-      <div class="empty-state" id="empty-state">
-        <span class="empty-icon">💊</span>
-        <p>Nenhum medicamento cadastrado ainda.</p>
-        <p class="empty-sub">Adicione o primeiro usando o formulário ao lado.</p>
-      </div>
-    </section>
-
-  </main>
-
-  <div class="modal-overlay" id="modal-overlay" style="display: none;">
-    <div class="modal">
-      <div class="modal-icon">⚠</div>
-      <h3>Remover medicamento?</h3>
-      <p id="modal-msg">Tem certeza que deseja remover este medicamento?</p>
-      <div class="modal-actions">
-        <button class="btn-cancel" id="btn-cancel">Cancelar</button>
-        <button class="btn-confirm" id="btn-confirm">Sim, remover</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
