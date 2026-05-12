@@ -1,58 +1,41 @@
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f4f1ea;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    margin: 0;
-}
-
-.container {
-    background: white;
-    width: 100%;
-    max-width: 450px;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-header { text-align: center; margin-bottom: 20px; }
-h1 { color: #2d5a4c; margin: 0; }
-
-input, textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-sizing: border-box;
-}
-
-button {
-    width: 100%;
-    padding: 15px;
-    background-color: #2d5a4c;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
 .medicamento-item {
-    background: #f9f9f9;
+    background: #ffffff;
     padding: 15px;
-    margin-top: 15px;
-    border-radius: 10px;
+    margin-top: 12px;
+    border-radius: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-left: 5px solid #2d5a4c;
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+}
+
+.medicamento-item:hover {
+    transform: scale(1.02);
+}
+
+.info strong {
+    color: #2d5a4c;
+    font-size: 1.1rem;
 }
 
 .btn-delete {
+    background-color: #ffeded;
+    color: #ff4d4d;
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.btn-delete:hover {
     background-color: #ff4d4d;
-    width: auto;
-    padding: 8px 12px;
-    font-size: 0.8rem;
+    color: white;
 }

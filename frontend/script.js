@@ -6,28 +6,37 @@ async function carregarMedicamentos() {
         const response = await fetch(API_URL);
         const medicamentos = await response.json();
         
-        lista.innerHTML = medicamentos.length === 0 ? '<p>Nenhum cadastrado.</p>' : 
+        lista.innerHTML = medicamentos.length === 0 ? '<p style="text-align:center; color:#888;">Nenhum cadastrado.</p>' : 
             medicamentos.map(med => `
                 <div class="medicamento-item">
-                    <div>
-                        <strong>${med.nome}</strong> (${med.dosagem})<br>
-                        <small>⏰ ${med.horario}</small>
+                    <div class="info">
+                        <strong>💊 ${med.nome}</strong> <span>(${med.dosagem})</span><br>
+                        <small>⏰ Horário: ${med.horario}</small>
                     </div>
-                    <button class="btn-delete" onclick="remover(${med.id})">Excluir</button>
+                    <button class="btn-delete" onclick="remover(${med.id})">✕</button>
                 </div>
             `).join('');
     } catch (e) { lista.innerHTML = '<p>Erro ao carregar.</p>'; }
 }
 
+// FUNÇÃO ATUALIZADA: Sem o alerta chato
 async function remover(id) {
-    if (confirm("Deseja excluir?")) {
-        await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        carregarMedicamentos();
+    try {
+        const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            carregarMedicamentos(); // Atualiza a lista instantaneamente
+        }
+    } catch (e) {
+        console.error("Erro ao remover:", e);
     }
 }
 
 document.getElementById('form-medicamento').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+    btn.innerHTML = "Salvando...";
+
     const dados = {
         nome: document.getElementById('nome').value,
         dosagem: document.getElementById('dosagem').value,
@@ -43,8 +52,10 @@ document.getElementById('form-medicamento').addEventListener('submit', async (e)
 
     if (res.ok) {
         document.getElementById('form-medicamento').reset();
-        carregarMedicamentos();
+        await carregarMedicamentos();
     }
+    btn.disabled = false;
+    btn.innerHTML = "+ Adicionar";
 });
 
 carregarMedicamentos();
