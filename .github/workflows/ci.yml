@@ -1,7 +1,3 @@
- entrega-intermediaria
-- name: Rodar lint
-        run: python -m ruff check .
-
 name: CI
 
 on: [push, pull_request]
@@ -26,4 +22,4 @@ jobs:
 
       - name: Rodar testes
         run: python -m pytest
- main
+ 
