@@ -16,10 +16,163 @@ body {
     display: flex;
     justify-content: center;
     padding: 40px 20px;
+    box-sizing: border-box;
 }
 
+/* ============================================================
+   TELA DE LOGIN / CADASTRO
+   ============================================================ */
+
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-gradient);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.auth-box {
+    background: white;
+    border-radius: 28px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.auth-logo h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8rem;
+}
+
+.auth-sub {
+    color: var(--text-light);
+    margin: 0 0 24px 0;
+    font-size: 0.9rem;
+}
+
+/* Abas */
+.auth-tabs {
+    display: flex;
+    background: #f8f6f2;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 4px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.auth-tab.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Botão principal de auth */
+.btn-auth-pri {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 6px;
+}
+
+.btn-auth-pri:hover { background: var(--primary-hover); }
+.btn-auth-pri:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Mensagens de erro / sucesso */
+.erro-msg {
+    color: var(--danger);
+    font-size: 0.85rem;
+    background: var(--danger-light);
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin: 0 0 10px 0;
+}
+
+.sucesso-msg {
+    color: #2d5a4c;
+    font-size: 0.85rem;
+    background: #eaf4ef;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin: 0 0 10px 0;
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+
 .dashboard { width: 100%; max-width: 1000px; }
-.main-header { margin-bottom: 30px; color: var(--primary); }
+
+.main-header {
+    margin-bottom: 30px;
+    color: var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-header h1 { margin: 0 0 4px 0; }
+.main-header > div > p { margin: 0; color: var(--text-light); font-size: 0.9rem; }
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: 50px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.btn-logout {
+    background: var(--danger-light);
+    color: var(--danger);
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover { background: var(--danger); color: white; }
+
 .content-wrapper { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
 
 .card {
@@ -29,30 +182,94 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.04);
 }
 
-/* Inputs e Botão Adicionar */
-input, textarea {
-    width: 100%; padding: 12px; background: #f8f6f2;
-    border: 2px solid transparent; border-radius: 12px; box-sizing: border-box;
-    transition: all 0.3s;
+.logo-icon { color: var(--primary); }
+
+/* Inputs */
+label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 6px;
 }
-input:focus { border-color: var(--primary); outline: none; background: white; }
+
+.optional { font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.input-group { margin-bottom: 16px; }
+
+.input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    background: #f8f6f2;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    box-sizing: border-box;
+    transition: all 0.3s;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    background: white;
+}
 
 button#btn-submit {
-    width: 100%; padding: 14px; background: var(--primary);
-    color: white; border: none; border-radius: 14px; font-weight: bold; 
-    cursor: pointer; transition: background 0.3s;
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
 }
-button#btn-submit:hover { background: var(--primary-hover); }
 
-/* Estilo do Item na Lista */
+button#btn-submit:hover { background: var(--primary-hover); }
+button#btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Lista */
+.list-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.list-header h2 { margin: 0; }
+
+.badge {
+    background: var(--primary);
+    color: white;
+    border-radius: 50px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.search-bar { margin-bottom: 10px; }
+
 .medicamento-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 18px; background: #fff; border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    border-bottom: 1px solid #f0f0f0;
     transition: background 0.2s;
 }
+
 .medicamento-item:hover { background: #fafafa; }
 
-/* Botão de Excluir (O "X") */
 .btn-delete {
     background: var(--danger-light);
     color: var(--danger);
@@ -66,29 +283,40 @@ button#btn-submit:hover { background: var(--primary-hover); }
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
+    flex-shrink: 0;
 }
+
 .btn-delete:hover {
     background: var(--danger);
     color: white;
     transform: rotate(90deg);
 }
 
-/* Modal de Confirmação */
+/* Modal */
 .modal {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(45, 90, 76, 0.2); backdrop-filter: blur(8px); z-index: 1000;
-    justify-content: center; align-items: center;
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(45, 90, 76, 0.2);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
-    background: white; padding: 40px; border-radius: 28px; text-align: center;
-    max-width: 350px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    background: white;
+    padding: 40px;
+    border-radius: 28px;
+    text-align: center;
+    max-width: 350px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
 .modal-icon { font-size: 40px; margin-bottom: 15px; }
 .modal-content h3 { margin: 0; color: var(--text-main); font-size: 1.4rem; }
 .modal-content p { color: var(--text-light); line-height: 1.5; margin: 10px 0 25px; }
-
 .modal-buttons { display: flex; gap: 12px; }
 
 .btn-modal-cancelar {
@@ -105,4 +333,11 @@ button#btn-submit:hover { background: var(--primary-hover); }
 }
 .btn-modal-excluir:hover { opacity: 0.9; }
 
-@media (max-width: 800px) { .content-wrapper { grid-template-columns: 1fr; } }
+/* Responsivo */
+@media (max-width: 800px) {
+    body { padding: 20px 16px; }
+    .content-wrapper { grid-template-columns: 1fr; }
+    .main-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .input-row { grid-template-columns: 1fr; }
+    .user-badge { font-size: 0.75rem; }
+}

@@ -1,22 +1,33 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-# Define o que o site PRECISA enviar ao cadastrar um remédio
+
+# ── Autenticação ───────────────────────────────────────────────────────────────
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+# ── Medicamentos ───────────────────────────────────────────────────────────────
+
 class MedicamentoCreate(BaseModel):
     nome: str
     dosagem: str
     horario: str
     descricao: Optional[str] = None
 
-# Define como o remédio SERÁ EXIBIDO (incluindo o ID e o status)
 class Medicamento(BaseModel):
     id: int
     nome: str
     dosagem: str
     horario: str
     descricao: Optional[str] = None
-    tomado: bool = False
+    usuario_id: int
 
-    # Permite que o Pydantic leia os dados vindos do Banco de Dados (ORM)
     class Config:
         from_attributes = True

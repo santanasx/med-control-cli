@@ -7,10 +7,70 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="dashboard">
+
+    <!-- ===================== TELA DE LOGIN / CADASTRO ===================== -->
+    <div id="tela-auth" class="auth-overlay">
+        <div class="auth-box">
+
+            <div class="auth-logo">
+                <span class="logo-icon">⊕</span>
+                <h1>MedControl</h1>
+            </div>
+            <p class="auth-sub">Seus medicamentos, no horário certo.</p>
+
+            <!-- Abas -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="mostrarAba('login')">Entrar</button>
+                <button class="auth-tab" id="tab-cadastro" onclick="mostrarAba('cadastro')">Criar conta</button>
+            </div>
+
+            <!-- Formulário de Login -->
+            <div id="form-login">
+                <div class="input-group">
+                    <label>E-MAIL</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <label>SENHA</label>
+                    <input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <p id="erro-login" class="erro-msg" style="display:none"></p>
+                <button class="btn-auth-pri" id="btn-entrar" onclick="entrar()">Entrar</button>
+            </div>
+
+            <!-- Formulário de Cadastro -->
+            <div id="form-cadastro" style="display:none">
+                <div class="input-group">
+                    <label>SEU NOME</label>
+                    <input type="text" id="cad-nome" placeholder="Ex: Maria">
+                </div>
+                <div class="input-group">
+                    <label>E-MAIL</label>
+                    <input type="email" id="cad-email" placeholder="seu@email.com" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <label>SENHA</label>
+                    <input type="password" id="cad-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                </div>
+                <p id="erro-cadastro" class="erro-msg" style="display:none"></p>
+                <p id="sucesso-cadastro" class="sucesso-msg" style="display:none">✅ Conta criada! Faça login.</p>
+                <button class="btn-auth-pri" id="btn-cadastrar" onclick="cadastrar()">Criar conta</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===================== DASHBOARD PRINCIPAL ===================== -->
+    <div class="dashboard" id="dashboard" style="display:none">
         <header class="main-header">
-            <h1><span class="logo-icon">⊕</span> MedControl</h1>
-            <p>Seus medicamentos, no horário certo.</p>
+            <div>
+                <h1><span class="logo-icon">⊕</span> MedControl</h1>
+                <p>Seus medicamentos, no horário certo.</p>
+            </div>
+            <div class="user-badge">
+                <span id="usuario-email-header"></span>
+                <button class="btn-logout" onclick="sair()">Sair</button>
+            </div>
         </header>
 
         <div class="content-wrapper">
@@ -45,7 +105,7 @@
                     <span id="contador-meds" class="badge">0</span>
                 </div>
                 <div class="search-bar">
-                    <input type="text" placeholder="🔍 Buscar medicamento...">
+                    <input type="text" id="busca" placeholder="🔍 Buscar medicamento..." oninput="filtrarBusca()">
                 </div>
                 <div id="lista-medicamentos">
                     <p class="empty-state">Carregando...</p>
@@ -54,6 +114,7 @@
         </div>
     </div>
 
+    <!-- Modal de confirmação de exclusão -->
     <div id="modal-confirmacao" class="modal">
         <div class="modal-content">
             <div class="modal-icon">⚠️</div>
