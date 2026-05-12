@@ -1,5 +1,4 @@
 import os
-import json
 import tempfile
 from app import storage
 
