@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Configuração do Banco de Dados SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite:///./medcontrol.db"
+SQLALCHEMY_DATABASE_URL = "https://med-control-cli.onrender.com/pacientes.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

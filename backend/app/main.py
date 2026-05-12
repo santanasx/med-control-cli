@@ -5,10 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
-# Adiciona a pasta atual ao caminho para achar o 'storage' e 'schemas'
+# --- AJUSTE DE CAMINHO ---
+# Adiciona a pasta 'app' ao sistema para que ele encontre 'storage' e 'schemas'
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import storage
+# Importações diretas agora que o caminho foi ajustado
+from infraestrutura import storage
 import schemas
 
 app = FastAPI()
@@ -23,6 +25,7 @@ app.add_middleware(
 
 @app.get("/pacientes", response_model=List[schemas.Medicamento])
 def listar(db: Session = Depends(storage.get_db)):
+    # Certifique-se que o modelo em storage.py se chama Medicamento
     return db.query(storage.Medicamento).all()
 
 @app.post("/pacientes", response_model=schemas.Medicamento)
@@ -35,4 +38,4 @@ def criar(med: schemas.MedicamentoCreate, db: Session = Depends(storage.get_db))
 
 @app.get("/")
 def root():
-    return {"message": "API MedControl Online"}
+    return {"status": "online"}
