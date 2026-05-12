@@ -1,243 +1,81 @@
-// Substitua a URL abaixo caso seu Back-end não esteja rodando localmente na porta 8000
-const API_URL = 'http://localhost:8000/medicamentos';
-let medications = [];
-let pendingRemoveId = null;
+// URL da sua API no Render
+const API_URL = "https://med-control-cli.onrender.com/pacientes";
 
-// ── Elementos ───────────────────────────────
-const btnAdd       = document.getElementById('btn-add');
-const inputName    = document.getElementById('med-name');
-const inputDose    = document.getElementById('med-dose');
-const inputTime    = document.getElementById('med-time');
-const inputNotes   = document.getElementById('med-notes');
-const errorMsg     = document.getElementById('error-msg');
+// Elementos do DOM
+const formMedicamento = document.getElementById('form-medicamento'); // Verifique se o ID no HTML é este
+const listaMedicamentos = document.getElementById('lista-medicamentos');
 
-const medList      = document.getElementById('med-list');
-const emptyState   = document.getElementById('empty-state');
-const countBadge   = document.getElementById('count-badge');
-const searchInput  = document.getElementById('search');
-
-const modalOverlay = document.getElementById('modal-overlay');
-const modalMsg     = document.getElementById('modal-msg');
-const btnCancel    = document.getElementById('btn-cancel');
-const btnConfirm   = document.getElementById('btn-confirm');
-const toastEl      = document.getElementById('toast');
-
-// ── Integração com a API ────────────────────
-async function loadMedications() {
-  try {
-    const response = await fetch('https://med-control-cli.onrender.com/pacientes');
-    if (response.ok) {
-      medications = await response.json();
-      renderList(searchInput.value);
+// Função para listar os medicamentos (GET)
+async function carregarMedicamentos() {
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Erro ao buscar dados');
+        
+        const medicamentos = await response.json();
+        exibirMedicamentos(medicamentos);
+    } catch (error) {
+        console.error("Erro:", error);
     }
-  } catch (error) {
-    showError('Erro ao conectar. Verifique se o Back-end está rodando.');
-  }
 }
 
-// ── Utilitários ─────────────────────────────
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
-function showToast(msg, color = '#1a4a3a') {
-  toastEl.textContent = msg;
-  toastEl.style.background = color;
-  toastEl.classList.add('show');
-  setTimeout(() => toastEl.classList.remove('show'), 2800);
-}
-
-function showError(msg) {
-  errorMsg.textContent = msg;
-  setTimeout(() => (errorMsg.textContent = ''), 3000);
-}
-
-function formatTime(t) {
-  if (!t) return '--:--';
-  const [h, m] = t.split(':');
-  return `${h}h${m}`;
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-// ── Renderização ────────────────────────────
-function renderList(filter = '') {
-  const term = filter.trim().toLowerCase();
-  const filtered = term
-    ? medications.filter(m =>
-        m.name.toLowerCase().includes(term) ||
-        m.dose.toLowerCase().includes(term)
-      )
-    : medications;
-
-  // Ordenar por horário
-  const sorted = [...filtered].sort((a, b) => a.time.localeCompare(b.time));
-
-  medList.innerHTML = '';
-
-  if (filtered.length === 0) {
-    emptyState.classList.add('visible');
-  } else {
-    emptyState.classList.remove('visible');
-    sorted.forEach(med => {
-      const li = createMedItem(med);
-      medList.appendChild(li);
-    });
-  }
-
-  countBadge.textContent = medications.length;
-
-  // Animação do badge
-  countBadge.style.transform = 'scale(1.35)';
-  setTimeout(() => (countBadge.style.transform = 'scale(1)'), 200);
-}
-
-function createMedItem(med) {
-  const li = document.createElement('li');
-  li.dataset.id = med.id; 
-  li.className = 'med-item';
-  
-  li.innerHTML = `
-    <div class="item-info">
-      <div class="item-name">${escapeHtml(med.name)}</div>
-      <div class="item-dose">${escapeHtml(med.dose)}</div>
-      ${med.notes ? `<div class="item-notes">📝 ${escapeHtml(med.notes)}</div>` : ''}
-    </div>
-    <div class="item-time-badge">${formatTime(med.time)}</div>
-    <button class="btn-remove" onclick="openModal('${med.id}', '${escapeHtml(med.name)}')">✖</button>
-  `;
-  return li;
-}
-
-// ── Adicionar ────────────────────────────────
-async function addMedication() {
-  const name  = inputName.value.trim();
-  const dose  = inputDose.value.trim();
-  const time  = inputTime.value;
-  const notes = inputNotes.value.trim();
-
-  if (!name) return showError('⚠ Informe o nome do medicamento.');
-  if (!dose) return showError('⚠ Informe a dosagem.');
-  if (!time) return showError('⚠ Selecione o horário.');
-
-  const med = { id: generateId(), name, dose, time, notes };
-
-  try {
-    // Envia os dados para a API (Back End)
-    const response = await fetch('https://med-control-cli.onrender.com/pacientes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(med)
-    });
-
-    if (response.ok) {
-      const novoMed = await response.json();
-      medications.push(novoMed);
-      renderList(searchInput.value);
-
-      // Limpar campos
-      inputName.value  = '';
-      inputDose.value  = '';
-      inputTime.value  = '';
-      inputNotes.value = '';
-      inputName.focus();
-
-      showToast(`✓ ${name} adicionado com sucesso!`);
-    } else {
-      showError('Erro ao salvar no banco de dados.');
+// Função para exibir os medicamentos na tela
+function exibirMedicamentos(medicamentos) {
+    listaMedicamentos.innerHTML = ''; // Limpa a lista antes de carregar
+    
+    if (medicamentos.length === 0) {
+        listaMedicamentos.innerHTML = '<p>Nenhum medicamento cadastrado.</p>';
+        return;
     }
-  } catch (error) {
-    showError('Erro de conexão com o servidor. A API está rodando?');
-  }
-}
 
-// ── Remover ──────────────────────────────────
-function openModal(id, name) {
-  pendingRemoveId = id;
-  modalMsg.textContent = `Deseja remover "${name}" da lista?`;
-  
-  // Exibe o modal controlando o display e a classe
-  if (modalOverlay) {
-    modalOverlay.style.display = 'flex';
-    modalOverlay.classList.add('active');
-  }
-}
-
-function closeModal() {
-  pendingRemoveId = null;
-  if (modalOverlay) {
-    modalOverlay.style.display = 'none';
-    modalOverlay.classList.remove('active');
-  }
-}
-
-async function confirmRemove() {
-  if (!pendingRemoveId) return;
-
-  const idToRemove = pendingRemoveId; 
-  const med = medications.find(m => m.id === idToRemove);
-  const li = medList.querySelector(`[data-id="${idToRemove}"]`);
-
-  try {
-    // Avisa a API para deletar do banco de dados
-    const response = await fetch(`https://med-control-cli.onrender.com/pacientes/${idToRemove}`, {
-      method: 'DELETE'
+    medicamentos.forEach(med => {
+        const div = document.createElement('div');
+        div.className = 'medicamento-item';
+        div.innerHTML = `
+            <strong>${med.nome}</strong> - ${med.dosagem} (${med.horario})
+            <p>${med.descricao || 'Sem observações'}</p>
+            <hr>
+        `;
+        listaMedicamentos.appendChild(div);
     });
-
-    if (response.ok) {
-      if (li) {
-        li.classList.add('removing');
-        setTimeout(() => {
-          medications = medications.filter(m => m.id !== idToRemove);
-          renderList(searchInput.value);
-        }, 280);
-      } else {
-        medications = medications.filter(m => m.id !== idToRemove);
-        renderList(searchInput.value);
-      }
-      closeModal();
-      showToast(`🗑 ${med ? med.name : 'Medicamento'} removido.`, '#c0392b');
-    }
-  } catch (error) {
-    showError('Erro ao deletar no servidor.');
-    closeModal();
-  }
 }
 
-// ── Eventos ──────────────────────────────────
-if (btnAdd) {
-  btnAdd.addEventListener('click', addMedication);
-}
+// Função para adicionar um novo medicamento (POST)
+if (formMedicamento) {
+    formMedicamento.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-[inputName, inputDose, inputTime, inputNotes].forEach(el => {
-  if (el) {
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') addMedication();
+        // Pega os valores dos campos (Verifique se os IDs batem com seu HTML)
+        const novoMed = {
+            nome: document.getElementById('nome').value,
+            dosagem: document.getElementById('dosagem').value,
+            horario: document.getElementById('horario').value,
+            descricao: document.getElementById('observacoes').value // No backend é 'descricao'
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(novoMed)
+            });
+
+            if (response.ok) {
+                alert("✅ Medicamento salvo com sucesso!");
+                formMedicamento.reset(); // Limpa o formulário
+                carregarMedicamentos();  // Atualiza a lista
+            } else {
+                const erro = await response.json();
+                console.error("Erro do servidor:", erro);
+                alert("❌ Erro ao salvar no banco de dados.");
+            }
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            alert("❌ Não foi possível conectar ao servidor.");
+        }
     });
-  }
-});
-
-if (searchInput) searchInput.addEventListener('input', () => renderList(searchInput.value));
-if (btnCancel) btnCancel.addEventListener('click', closeModal);
-if (btnConfirm) btnConfirm.addEventListener('click', confirmRemove);
-
-if (modalOverlay) {
-  modalOverlay.addEventListener('click', e => {
-    if (e.target === modalOverlay) closeModal();
-  });
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
-
-// ── Init ────────────────────────────────────
-// Carrega a lista do banco de dados ao abrir a página
-loadMedications();
+// Carrega os dados assim que a página abrir
+carregarMedicamentos();
