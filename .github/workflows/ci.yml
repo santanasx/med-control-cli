@@ -32,3 +32,28 @@ jobs:
         run: |
           pytest tests/ -v --ignore=tests/test_integracao_openfda.py -k "not real_api"
           pytest tests/test_integracao_openfda.py -v -k "not real_api"
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar lint
+        run: ruff check .
+
+      - name: Rodar testes
+        run: python -m pytest
+ 

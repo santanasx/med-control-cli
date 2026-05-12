@@ -1,4 +1,5 @@
 from app.storage import save_meds, load_meds  # Adicione o import correto aqui
+from app import main
 
 def test_salvar_e_carregar():
     save_meds([{"nome": "Dipirona"}])
