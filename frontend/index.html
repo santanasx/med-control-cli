@@ -7,29 +7,56 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>💊 MedControl</h1>
-            <p>Gerencie seus horários com facilidade</p>
+    <div class="dashboard">
+        <header class="main-header">
+            <h1><span class="logo-icon">⊕</span> MedControl</h1>
+            <p>Seus medicamentos, no horário certo.</p>
         </header>
 
-        <section class="form-section">
-            <h2>Adicionar Medicamento</h2>
-            <form id="form-medicamento">
-                <input type="text" id="nome" placeholder="Nome do Medicamento" required>
-                <input type="text" id="dosagem" placeholder="Dosagem (ex: 600mg)" required>
-                <input type="time" id="horario" required>
-                <textarea id="observacoes" placeholder="Observações (opcional)"></textarea>
-                <button type="submit">+ Adicionar</button>
-            </form>
-        </section>
+        <div class="content-wrapper">
+            <section class="card add-card">
+                <h2>Adicionar Medicamento</h2>
+                <form id="form-medicamento">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>NOME DO MEDICAMENTO</label>
+                            <input type="text" id="nome" placeholder="Ex: Dipirona 500mg" required>
+                        </div>
+                        <div class="input-group">
+                            <label>DOSAGEM</label>
+                            <input type="text" id="dosagem" placeholder="Ex: 1 comprimido" required>
+                        </div>
+                    </div>
 
-        <section class="lista-section">
-            <h2>Meus Medicamentos</h2>
-            <div id="lista-medicamentos">
-                <p>Carregando...</p>
-            </div>
-        </section>
+                    <div class="input-group">
+                        <label>HORÁRIO</label>
+                        <input type="time" id="horario" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>OBSERVAÇÕES <span class="optional">(opcional)</span></label>
+                        <textarea id="observacoes" placeholder="Ex: Tomar após as refeições"></textarea>
+                    </div>
+
+                    <button type="submit" id="btn-submit">+ Adicionar</button>
+                </form>
+            </section>
+
+            <section class="card list-card">
+                <div class="list-header">
+                    <h2>Meus Medicamentos</h2>
+                    <span id="contador-meds" class="badge">0</span>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" placeholder="🔍 Buscar medicamento...">
+                </div>
+
+                <div id="lista-medicamentos">
+                    <p class="empty-state">Nenhum medicamento cadastrado.</p>
+                </div>
+            </section>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

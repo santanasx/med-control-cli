@@ -2,39 +2,40 @@ const API_URL = "https://med-control-cli.onrender.com/pacientes";
 
 async function carregarMedicamentos() {
     const lista = document.getElementById('lista-medicamentos');
+    const contador = document.getElementById('contador-meds');
+    
     try {
         const response = await fetch(API_URL);
         const medicamentos = await response.json();
         
-        lista.innerHTML = medicamentos.length === 0 ? '<p style="text-align:center; color:#888;">Nenhum cadastrado.</p>' : 
-            medicamentos.map(med => `
-                <div class="medicamento-item">
-                    <div class="info">
-                        <strong>💊 ${med.nome}</strong> <span>(${med.dosagem})</span><br>
-                        <small>⏰ Horário: ${med.horario}</small>
-                    </div>
-                    <button class="btn-delete" onclick="remover(${med.id})">✕</button>
+        contador.innerText = medicamentos.length;
+        
+        if (medicamentos.length === 0) {
+            lista.innerHTML = '<p class="empty-state">Nenhum medicamento cadastrado.</p>';
+            return;
+        }
+
+        lista.innerHTML = medicamentos.map(med => `
+            <div class="medicamento-item">
+                <div>
+                    <strong style="color: #2d5a4c;">${med.nome}</strong> 
+                    <span style="color: #666; font-size: 0.9rem;">(${med.dosagem})</span><br>
+                    <small>⏰ ${med.horario}</small>
                 </div>
-            `).join('');
-    } catch (e) { lista.innerHTML = '<p>Erro ao carregar.</p>'; }
+                <button class="btn-delete" onclick="remover(${med.id})">✕</button>
+            </div>
+        `).join('');
+    } catch (e) { console.error(e); }
 }
 
-// FUNÇÃO ATUALIZADA: Sem o alerta chato
 async function remover(id) {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        if (response.ok) {
-            carregarMedicamentos(); // Atualiza a lista instantaneamente
-        }
-    } catch (e) {
-        console.error("Erro ao remover:", e);
-    }
+    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    carregarMedicamentos();
 }
 
 document.getElementById('form-medicamento').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.disabled = true;
+    const btn = document.getElementById('btn-submit');
     btn.innerHTML = "Salvando...";
 
     const dados = {
@@ -44,18 +45,15 @@ document.getElementById('form-medicamento').addEventListener('submit', async (e)
         descricao: document.getElementById('observacoes').value
     };
 
-    const res = await fetch(API_URL, {
+    await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
     });
 
-    if (res.ok) {
-        document.getElementById('form-medicamento').reset();
-        await carregarMedicamentos();
-    }
-    btn.disabled = false;
+    document.getElementById('form-medicamento').reset();
     btn.innerHTML = "+ Adicionar";
+    carregarMedicamentos();
 });
 
 carregarMedicamentos();
