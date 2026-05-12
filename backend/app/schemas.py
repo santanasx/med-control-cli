@@ -2,16 +2,17 @@ from pydantic import BaseModel
 from typing import Optional
 
 class MedicamentoBase(BaseModel):
-    name: str
-    dose: str
-    time: str
-    notes: Optional[str] = None
+    nome: str
+    dosagem: str
+    horario: str
+    descricao: Optional[str] = None
 
 class MedicamentoCreate(MedicamentoBase):
-    id: str
+    pass
 
-class MedicamentoResponse(MedicamentoBase):
-    id: str
+class Medicamento(MedicamentoBase):
+    id: int
+    tomado: bool = False
 
     class Config:
         from_attributes = True

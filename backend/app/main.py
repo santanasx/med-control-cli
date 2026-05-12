@@ -3,69 +3,47 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
-# Importações do seu próprio projeto (verifique se os caminhos estão corretos)
-import os
-import sys
-
-# Garante que o Python encontre as pastas do seu projeto
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from typing import List
-
-# Importações ajustadas
+# Importações relativas para o Render encontrar os arquivos vizinhos
 try:
-    import database, models, schemas
-except ImportError:
     from . import database, models, schemas
+except ImportError:
+    import database, models, schemas
 
-# Inicializa o app
-app = FastAPI(title="MedControl API")
-
-
-
-# Cria as tabelas no banco de dados automaticamente ao iniciar
-models.Base.metadata.create_all(bind=engine)
+# Cria as tabelas no banco de dados (SQLite)
+models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="MedControl API")
 
-# --- CONFIGURAÇÃO DE SEGURANÇA (CORS) ---
-# Isso permite que o seu site na Vercel consiga conversar com esta API no Render
+# Configuração de CORS - LIBERA O ACESSO PARA A VERCEL
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Em produção, você pode trocar "*" pelo link da Vercel
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 @app.get("/")
-def read_root():
-    return {"message": "API MedControl está online!"}
+def home():
+    return {"status": "online", "message": "API MedControl rodando com sucesso!"}
 
-# Rota para listar medicamentos (o que seu script.js chama no fetch)
 @app.get("/pacientes", response_model=List[schemas.Medicamento])
-def listar_medicamentos(db: Session = Depends(get_db)):
-    medicamentos = db.query(models.Medicamento).all()
-    return medicamentos
+def listar(db: Session = Depends(database.get_db)):
+    return db.query(models.Medicamento).all()
 
-# Rota para adicionar novo medicamento
 @app.post("/pacientes", response_model=schemas.Medicamento)
-def criar_medicamento(medicamento: schemas.MedicamentoCreate, db: Session = Depends(get_db)):
-    db_medicamento = models.Medicamento(**medicamento.dict())
-    db.add(db_medicamento)
+def adicionar(med: schemas.MedicamentoCreate, db: Session = Depends(database.get_db)):
+    db_med = models.Medicamento(**med.dict())
+    db.add(db_med)
     db.commit()
-    db.refresh(db_medicamento)
-    return db_medicamento
+    db.refresh(db_med)
+    return db_med
 
-# Rota para deletar (caso seu front-end tenha essa função)
-@app.delete("/pacientes/{med_id}")
-def deletar_medicamento(med_id: int, db: Session = Depends(get_db)):
-    db_med = db.query(models.Medicamento).filter(models.Medicamento.id == med_id).first()
+@app.delete("/pacientes/{id}")
+def remover(id: int, db: Session = Depends(database.get_db)):
+    db_med = db.query(models.Medicamento).filter(models.Medicamento.id == id).first()
     if not db_med:
-        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
+        raise HTTPException(status_code=404, detail="Não encontrado")
     db.delete(db_med)
     db.commit()
-    return {"message": "Removido com sucesso"}
+    return {"message": "Removido"}
