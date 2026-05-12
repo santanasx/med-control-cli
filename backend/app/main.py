@@ -5,22 +5,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
-# --- CORREÇÃO DE CAMINHO CRÍTICA ---
-# Adiciona o diretório atual ao sys.path para que o Render encontre os arquivos vizinhos
-current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(current_dir)
+# Isso ajuda o Python a encontrar a pasta 'infraestrutura'
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Importações agora sem o ponto (.), pois o sys.path já aponta para cá
-import database
-import models
-import schemas
+# Importações baseadas no que vejo no seu VS Code:
+try:
+    from infraestrutura import storage
+    import schemas
+except ImportError:
+    # Caso o Python esteja rodando de um nível acima
+    from .infraestrutura import storage
+    from . import schemas
 
-# Inicializa as tabelas do Banco de Dados
-models.Base.metadata.create_all(bind=database.engine)
+# O FastAPI inicia aqui
+app = FastAPI()
 
-app = FastAPI(title="MedControl API")
-
-# --- CONFIGURAÇÃO DE CORS PARA VERCEL ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,27 +28,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def health_check():
-    return {"status": "online", "backend": "Render", "frontend_allowed": "Vercel"}
-
 @app.get("/pacientes", response_model=List[schemas.Medicamento])
-def listar_medicamentos(db: Session = Depends(database.get_db)):
-    return db.query(models.Medicamento).all()
+def listar(db: Session = Depends(storage.get_db)):
+    # Note que usei 'storage' em vez de 'database' pois é o que aparece no seu print
+    return db.query(storage.Medicamento).all()
 
 @app.post("/pacientes", response_model=schemas.Medicamento)
-def criar_medicamento(medicamento: schemas.MedicamentoCreate, db: Session = Depends(database.get_db)):
-    db_medicamento = models.Medicamento(**medicamento.dict())
-    db.add(db_medicamento)
+def criar(med: schemas.MedicamentoCreate, db: Session = Depends(storage.get_db)):
+    db_med = storage.Medicamento(**med.dict())
+    db.add(db_med)
     db.commit()
-    db.refresh(db_medicamento)
-    return db_medicamento
+    db.refresh(db_med)
+    return db_med
 
-@app.delete("/pacientes/{med_id}")
-def deletar_medicamento(med_id: int, db: Session = Depends(database.get_db)):
-    db_med = db.query(models.Medicamento).filter(models.Medicamento.id == med_id).first()
-    if not db_med:
-        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
-    db.delete(db_med)
-    db.commit()
-    return {"message": "Sucesso"}
+@app.get("/")
+def root():
+    return {"status": "online"}
