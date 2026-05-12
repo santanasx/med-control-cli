@@ -2,19 +2,26 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
+import sys
+import os
 
-# Importações relativas para o Render encontrar os arquivos vizinhos
+# Força o Python a olhar dentro da pasta onde este arquivo está
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Importações diretas (como o sys.path foi ajustado, ele encontrará os arquivos vizinhos)
 try:
-    from . import database, models, schemas
+    import database
+    import models
+    import schemas
 except ImportError:
-    import database, models, schemas
+    from . import database, models, schemas
 
-# Cria as tabelas no banco de dados (SQLite)
+# Inicializa o Banco
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="MedControl API")
 
-# Configuração de CORS - LIBERA O ACESSO PARA A VERCEL
+# Liberação para o seu site na Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,7 +32,7 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"status": "online", "message": "API MedControl rodando com sucesso!"}
+    return {"status": "online", "link": "https://med-control-cli.onrender.com/pacientes"}
 
 @app.get("/pacientes", response_model=List[schemas.Medicamento])
 def listar(db: Session = Depends(database.get_db)):
