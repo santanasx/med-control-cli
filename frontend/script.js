@@ -1,4 +1,5 @@
-const API_URL = 'http://192.168.1.14:8000/medicamentos';
+// Substitua a URL abaixo caso seu Back-end não esteja rodando localmente na porta 8000
+const API_URL = 'http://localhost:8000/medicamentos';
 let medications = [];
 let pendingRemoveId = null;
 
@@ -30,7 +31,7 @@ async function loadMedications() {
       renderList(searchInput.value);
     }
   } catch (error) {
-    showError('Erro ao conectar com o servidor.');
+    showError('Erro ao conectar. Verifique se o Back-end está rodando.');
   }
 }
 
@@ -153,7 +154,7 @@ async function addMedication() {
       showError('Erro ao salvar no banco de dados.');
     }
   } catch (error) {
-    showError('Erro de conexão com o servidor.');
+    showError('Erro de conexão com o servidor. A API está rodando?');
   }
 }
 
@@ -161,12 +162,20 @@ async function addMedication() {
 function openModal(id, name) {
   pendingRemoveId = id;
   modalMsg.textContent = `Deseja remover "${name}" da lista?`;
-  modalOverlay.classList.add('active');
+  
+  // Exibe o modal controlando o display e a classe
+  if (modalOverlay) {
+    modalOverlay.style.display = 'flex';
+    modalOverlay.classList.add('active');
+  }
 }
 
 function closeModal() {
   pendingRemoveId = null;
-  modalOverlay.classList.remove('active');
+  if (modalOverlay) {
+    modalOverlay.style.display = 'none';
+    modalOverlay.classList.remove('active');
+  }
 }
 
 async function confirmRemove() {
@@ -203,21 +212,27 @@ async function confirmRemove() {
 }
 
 // ── Eventos ──────────────────────────────────
-btnAdd.addEventListener('click', addMedication);
+if (btnAdd) {
+  btnAdd.addEventListener('click', addMedication);
+}
 
 [inputName, inputDose, inputTime, inputNotes].forEach(el => {
-  el.addEventListener('keydown', e => {
-    if (e.key === 'Enter') addMedication();
+  if (el) {
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addMedication();
+    });
+  }
+});
+
+if (searchInput) searchInput.addEventListener('input', () => renderList(searchInput.value));
+if (btnCancel) btnCancel.addEventListener('click', closeModal);
+if (btnConfirm) btnConfirm.addEventListener('click', confirmRemove);
+
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', e => {
+    if (e.target === modalOverlay) closeModal();
   });
-});
-
-searchInput.addEventListener('input', () => renderList(searchInput.value));
-btnCancel.addEventListener('click', closeModal);
-btnConfirm.addEventListener('click', confirmRemove);
-
-modalOverlay.addEventListener('click', e => {
-  if (e.target === modalOverlay) closeModal();
-});
+}
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
