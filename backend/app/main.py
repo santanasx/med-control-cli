@@ -1,27 +1,26 @@
+import os
+import sys
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-import sys
-import os
 
-# Força o Python a olhar dentro da pasta onde este arquivo está
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# --- CORREÇÃO DE CAMINHO CRÍTICA ---
+# Adiciona o diretório atual ao sys.path para que o Render encontre os arquivos vizinhos
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
 
-# Importações diretas (como o sys.path foi ajustado, ele encontrará os arquivos vizinhos)
-try:
-    import database
-    import models
-    import schemas
-except ImportError:
-    from . import database, models, schemas
+# Importações agora sem o ponto (.), pois o sys.path já aponta para cá
+import database
+import models
+import schemas
 
-# Inicializa o Banco
+# Inicializa as tabelas do Banco de Dados
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="MedControl API")
 
-# Liberação para o seu site na Vercel
+# --- CONFIGURAÇÃO DE CORS PARA VERCEL ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,26 +30,26 @@ app.add_middleware(
 )
 
 @app.get("/")
-def home():
-    return {"status": "online", "link": "https://med-control-cli.onrender.com/pacientes"}
+def health_check():
+    return {"status": "online", "backend": "Render", "frontend_allowed": "Vercel"}
 
 @app.get("/pacientes", response_model=List[schemas.Medicamento])
-def listar(db: Session = Depends(database.get_db)):
+def listar_medicamentos(db: Session = Depends(database.get_db)):
     return db.query(models.Medicamento).all()
 
 @app.post("/pacientes", response_model=schemas.Medicamento)
-def adicionar(med: schemas.MedicamentoCreate, db: Session = Depends(database.get_db)):
-    db_med = models.Medicamento(**med.dict())
-    db.add(db_med)
+def criar_medicamento(medicamento: schemas.MedicamentoCreate, db: Session = Depends(database.get_db)):
+    db_medicamento = models.Medicamento(**medicamento.dict())
+    db.add(db_medicamento)
     db.commit()
-    db.refresh(db_med)
-    return db_med
+    db.refresh(db_medicamento)
+    return db_medicamento
 
-@app.delete("/pacientes/{id}")
-def remover(id: int, db: Session = Depends(database.get_db)):
-    db_med = db.query(models.Medicamento).filter(models.Medicamento.id == id).first()
+@app.delete("/pacientes/{med_id}")
+def deletar_medicamento(med_id: int, db: Session = Depends(database.get_db)):
+    db_med = db.query(models.Medicamento).filter(models.Medicamento.id == med_id).first()
     if not db_med:
-        raise HTTPException(status_code=404, detail="Não encontrado")
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
     db.delete(db_med)
     db.commit()
-    return {"message": "Removido"}
+    return {"message": "Sucesso"}
