@@ -25,7 +25,7 @@ const toastEl      = document.getElementById('toast');
 // ── Integração com a API ────────────────────
 async function loadMedications() {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch('https://med-control-cli.onrender.com/pacientes');
     if (response.ok) {
       medications = await response.json();
       renderList(searchInput.value);
@@ -131,7 +131,7 @@ async function addMedication() {
 
   try {
     // Envia os dados para a API (Back End)
-    const response = await fetch(API_URL, {
+    const response = await fetch('https://med-control-cli.onrender.com/pacientes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(med)
@@ -187,7 +187,7 @@ async function confirmRemove() {
 
   try {
     // Avisa a API para deletar do banco de dados
-    const response = await fetch(`${API_URL}/${idToRemove}`, {
+    const response = await fetch(`https://med-control-cli.onrender.com/pacientes/${idToRemove}`, {
       method: 'DELETE'
     });
 
