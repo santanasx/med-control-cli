@@ -5,11 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
-# --- AJUSTE DE CAMINHO ---
-# Adiciona a pasta 'app' ao sistema para que ele encontre 'storage' e 'schemas'
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-# Importações diretas agora que o caminho foi ajustado
 from infraestrutura import storage
 import schemas
 
@@ -25,7 +21,6 @@ app.add_middleware(
 
 @app.get("/pacientes", response_model=List[schemas.Medicamento])
 def listar(db: Session = Depends(storage.get_db)):
-    # Certifique-se que o modelo em storage.py se chama Medicamento
     return db.query(storage.Medicamento).all()
 
 @app.post("/pacientes", response_model=schemas.Medicamento)
@@ -35,6 +30,16 @@ def criar(med: schemas.MedicamentoCreate, db: Session = Depends(storage.get_db))
     db.commit()
     db.refresh(db_med)
     return db_med
+
+# --- NOVA ROTA PARA DELETAR ---
+@app.delete("/pacientes/{med_id}")
+def deletar(med_id: int, db: Session = Depends(storage.get_db)):
+    db_med = db.query(storage.Medicamento).filter(storage.Medicamento.id == med_id).first()
+    if not db_med:
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
+    db.delete(db_med)
+    db.commit()
+    return {"message": "Removido com sucesso"}
 
 @app.get("/")
 def root():

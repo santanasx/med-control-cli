@@ -1,6 +1,5 @@
 const API_URL = "https://med-control-cli.onrender.com/pacientes";
 
-// Função para buscar e mostrar os medicamentos na tela
 async function carregarMedicamentos() {
     try {
         const response = await fetch(API_URL);
@@ -15,31 +14,44 @@ async function carregarMedicamentos() {
 
             lista.innerHTML = medicamentos.map(med => `
                 <div class="medicamento-item">
-                    <strong>💊 ${med.nome}</strong> - ${med.dosagem}<br>
-                    <small>⏰ Horário: ${med.horario}</small>
-                    <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #666;">
-                        ${med.descricao || 'Sem observações'}
-                    </p>
+                    <div>
+                        <strong>💊 ${med.nome}</strong> - ${med.dosagem}<br>
+                        <small>⏰ Horário: ${med.horario}</small>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #666;">${med.descricao || ''}</p>
+                    </div>
+                    <button class="btn-delete" onclick="removerMedicamento(${med.id})">🗑️</button>
                 </div>
             `).join('');
         }
     } catch (error) {
-        console.error("Erro ao carregar lista:", error);
+        console.error("Erro ao carregar:", error);
     }
 }
 
-// Configuração do Formulário
+// FUNÇÃO PARA REMOVER
+async function removerMedicamento(id) {
+    if (confirm("Deseja realmente excluir este medicamento?")) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                carregarMedicamentos(); // Atualiza a lista
+            } else {
+                alert("Erro ao excluir.");
+            }
+        } catch (error) {
+            console.error("Erro de conexão:", error);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form-medicamento');
-    
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Feedback visual no botão
-            const botao = form.querySelector('button');
-            botao.disabled = true;
-            botao.innerHTML = "Salvando...";
+            const btn = form.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = "Salvando...";
 
             const novoMed = {
                 nome: document.getElementById('nome').value,
@@ -54,22 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(novoMed)
                 });
-
                 if (response.ok) {
-                    form.reset(); // Limpa os campos
-                    await carregarMedicamentos(); // Atualiza a lista na hora
-                } else {
-                    alert("Erro ao salvar no servidor. Verifique o banco de dados.");
+                    form.reset();
+                    await carregarMedicamentos();
                 }
-            } catch (error) {
-                console.error("Erro de conexão:", error);
             } finally {
-                botao.disabled = false;
-                botao.innerHTML = "+ Adicionar";
+                btn.disabled = false;
+                btn.innerHTML = "+ Adicionar";
             }
         });
     }
-    
-    // Carrega a lista assim que abrir o site
     carregarMedicamentos();
 });
